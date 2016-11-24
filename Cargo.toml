@@ -1,0 +1,6 @@
+[package]
+name = "rust-apriori"
+version = "0.1.0"
+authors = ["Maxime Gaudron <maxxg57@gmail.com>"]
+
+[dependencies]
