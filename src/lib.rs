@@ -6,9 +6,9 @@ mod recommendation {
 
     #[derive(Debug,Default,Clone)]
     pub struct ItemSet {
-        items: HashSet<u64>,
-        support: f64,
-        count: u64
+        pub items: HashSet<u64>,
+        pub support: f64,
+        pub count: u64
     }
 
     impl Hash for ItemSet {
@@ -96,25 +96,37 @@ mod recommendation {
 
         output
     }
-
+}
 #[cfg(test)]
-    mod tests {
-        use super::*;
+ 
+mod tests {
+    use recommendation::*;
 
-        #[test]
-        fn it_works() {
-            let sets = vec![
-                vec![1,2,3,4],
-                vec![1,2,4],
-                vec![1,2],
-                vec![2,3,4],
-                vec![2,3],
-                vec![3,4],
-                vec![2,4]
-            ];
+    #[test]
+    fn it_works() {
+        let sets = vec![
+            vec![1,2,3,4],
+            vec![1,2,4],
+            vec![1,2],
+            vec![2,3,4],
+            vec![2,3],
+            vec![3,4],
+            vec![2,4]
+        ];
 
-            let output = apriori(sets, 0.42);
-            println!("Output: {:?}", output);
-        }
+        let output = apriori(sets, 0.42);
+        assert!(output.len() == 4);
+
+        let set1output = output.get(&ItemSet {items: vec!(4,2).into_iter().collect(), ..Default::default()});
+        let set2output = output.get(&ItemSet {items: vec!(3,2).into_iter().collect(), ..Default::default()});
+        let set3output = output.get(&ItemSet {items: vec!(1,2).into_iter().collect(), ..Default::default()});
+        let set4output = output.get(&ItemSet {items: vec!(3,4).into_iter().collect(), ..Default::default()});
+            
+        assert!(set1output.is_some());
+        assert!(set2output.is_some());
+        assert!(set3output.is_some());
+        assert!(set4output.is_some());
+            
+        println!("Output: {:?}", output);
     }
 }
