@@ -13,8 +13,10 @@ mod recommendation {
 
     impl Hash for ItemSet {
         fn hash<H: Hasher>(&self, state: &mut H) {
-            for i in self.items.iter() {
-                state.write_u64(*i);
+            let mut a: Vec<u64> = self.items.iter().cloned().collect();
+            a.sort();
+            for s in a.iter() {
+                state.write_u64(*s);
             }
         }
     }
@@ -115,7 +117,8 @@ mod tests {
         ];
 
         let output = apriori(sets, 0.42);
-        assert!(output.len() == 4);
+
+        assert_eq!(output.len(), 4);
 
         let set1output = output.get(&ItemSet {items: vec!(4,2).into_iter().collect(), ..Default::default()});
         let set2output = output.get(&ItemSet {items: vec!(3,2).into_iter().collect(), ..Default::default()});
