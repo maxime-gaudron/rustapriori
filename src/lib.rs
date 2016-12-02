@@ -8,7 +8,7 @@ mod recommendation {
     pub struct ItemSet {
         pub items: HashSet<u64>,
         pub support: f64,
-        pub count: u64
+        pub count: u64,
     }
 
     impl Hash for ItemSet {
@@ -39,18 +39,15 @@ mod recommendation {
             .iter()
             .filter(|&(_, &v)| v as f64 / sets_count as f64 > min_support)
             .fold(HashSet::new(), |mut acc, (&k, &v)| {
-                acc.insert(
-                    ItemSet {
-                        items: vec!(*k).into_iter().collect::<HashSet<u64>>(),
-                        support: v as f64 / sets_count as f64,
-                        count: v,
-                        ..Default::default()
-                    }
-                );
+                acc.insert(ItemSet {
+                    items: vec![*k].into_iter().collect::<HashSet<u64>>(),
+                    support: v as f64 / sets_count as f64,
+                    count: v,
+                    ..Default::default()
+                });
 
                 acc
-            }
-        );
+            });
 
         (large, sets_count)
     }
@@ -62,7 +59,7 @@ mod recommendation {
                     let mut candidate = lit.items.clone();
 
                     candidate.insert(i1);
-                    acc.insert(ItemSet{items: candidate, ..Default::default()});
+                    acc.insert(ItemSet { items: candidate, ..Default::default() });
                 }
             }
 
@@ -83,15 +80,17 @@ mod recommendation {
                 candidates = candidates.into_iter()
                     .map(|mut x| {
                         if x.items.is_subset(&hash_set) {
-                            x.count +=1;
+                            x.count += 1;
                             x.support = x.count as f64 / sets_count as f64;
                         }
 
                         x
-                    }).collect();
+                    })
+                    .collect();
             }
 
-            large = HashSet::from_iter(candidates.iter().cloned().filter(|x| x.support > min_support));
+            large =
+                HashSet::from_iter(candidates.iter().cloned().filter(|x| x.support > min_support));
 
             output.extend(large.clone());
         }
@@ -100,36 +99,38 @@ mod recommendation {
     }
 }
 #[cfg(test)]
- 
+
 mod tests {
     use recommendation::*;
 
     #[test]
     fn it_works() {
-        let sets = vec![
-            vec![1,2,3,4],
-            vec![1,2,4],
-            vec![1,2],
-            vec![2,3,4],
-            vec![2,3],
-            vec![3,4],
-            vec![2,4]
-        ];
+        let sets = vec![vec![1, 2, 3, 4],
+                        vec![1, 2, 4],
+                        vec![1, 2],
+                        vec![2, 3, 4],
+                        vec![2, 3],
+                        vec![3, 4],
+                        vec![2, 4]];
 
         let output = apriori(sets, 0.42);
 
         assert_eq!(output.len(), 4);
 
-        let set1output = output.get(&ItemSet {items: vec!(4,2).into_iter().collect(), ..Default::default()});
-        let set2output = output.get(&ItemSet {items: vec!(3,2).into_iter().collect(), ..Default::default()});
-        let set3output = output.get(&ItemSet {items: vec!(1,2).into_iter().collect(), ..Default::default()});
-        let set4output = output.get(&ItemSet {items: vec!(3,4).into_iter().collect(), ..Default::default()});
-            
+        let set1output =
+            output.get(&ItemSet { items: vec![4, 2].into_iter().collect(), ..Default::default() });
+        let set2output =
+            output.get(&ItemSet { items: vec![3, 2].into_iter().collect(), ..Default::default() });
+        let set3output =
+            output.get(&ItemSet { items: vec![1, 2].into_iter().collect(), ..Default::default() });
+        let set4output =
+            output.get(&ItemSet { items: vec![3, 4].into_iter().collect(), ..Default::default() });
+
         assert!(set1output.is_some());
         assert!(set2output.is_some());
         assert!(set3output.is_some());
         assert!(set4output.is_some());
-            
+
         println!("Output: {:?}", output);
     }
 }
