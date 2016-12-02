@@ -57,9 +57,14 @@ mod recommendation {
             for lit in large.iter() {
                 for i1 in rit.items.difference(&lit.items).cloned() {
                     let mut candidate = lit.items.clone();
-
                     candidate.insert(i1);
-                    acc.insert(ItemSet { items: candidate, ..Default::default() });
+
+                    if candidate.iter().fold(true, |acc, elem| {
+                        let subset = candidate.difference(&vec![*elem].into_iter().collect::<HashSet<u64>>()).cloned().collect();
+                        acc && large.contains(&ItemSet { items: subset, ..Default::default() })
+                    }) {
+                        acc.insert(ItemSet { items: candidate, ..Default::default() });
+                    }
                 }
             }
 
